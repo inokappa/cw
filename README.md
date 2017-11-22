@@ -8,9 +8,11 @@
 
 ### cw の取得
 
-* cw バイナリをパスが通ったディレクトリにぽいっと置くだけです
+以下の通り, cw バイナリをパスが通ったディレクトリにぽいっと置くだけです.
 
 ```
+wget https://github.com/inokappa/cw/releases/download/v0.0.1/cw_{{.OS}}_{{.Arch}} -O /path/to/dir/cw
+chmod +x /path/to/dir/cw
 ```
 
 ### ヘルプ

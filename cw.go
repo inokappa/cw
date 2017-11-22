@@ -7,6 +7,7 @@ import (
     "time"
     "io/ioutil"
     "sort"
+    "reflect"
     "github.com/aws/aws-sdk-go/service/cloudwatch"
     "github.com/aws/aws-sdk-go/aws"
     "github.com/aws/aws-sdk-go/aws/session"
@@ -50,7 +51,30 @@ func readConfig(config_yaml string, target string) (config map[interface{}]inter
         fmt.Println(err)
     }
 
+    if m[target] == nil {
+        fmt.Println("指定したターゲットが存在していません.")
+        os.Exit(1)
+    }
+
     config = make(map[interface{}]interface{})
+
+    // 苦肉のエラー処理
+    for _, v := range []string{"start_time", "metric_name", "namespace", "period", "statistics", "dimensions", "unit"} {
+        if m[target].(map[interface {}]interface {})[v] == nil {
+            fmt.Println(v + " の定義に問題があります.")
+            os.Exit(1)
+        } else {
+            if v == "start_time" || v == "period" {
+                f := m[target].(map[interface {}]interface {})[v]
+                xt := reflect.TypeOf(f).Kind()
+                if xt != reflect.Int {
+                    fmt.Println(v + " の値に問題があります.")
+                    os.Exit(1)
+                }
+            }
+        }
+    }
+
     config["start_time"] = m[target].(map[interface {}]interface {})["start_time"].(int)
     config["metric_name"] = m[target].(map[interface {}]interface {})["metric_name"].(string)
     config["namespace"] = m[target].(map[interface {}]interface {})["namespace"].(string)
@@ -66,6 +90,10 @@ func generateDimensions(dimensions []interface{}) []*cloudwatch.Dimension {
     var dims []*cloudwatch.Dimension
     for _, dimension := range dimensions {
         d, _ := dimension.(map[interface {}]interface {})
+        if d["name"] == nil || d["value"] == nil {
+            fmt.Println("Dimension の設定項目に問題があります.")
+            os.Exit(1)
+        }
         dim := &cloudwatch.Dimension{
             Name: aws.String(d["name"].(string)),
             Value: aws.String(d["value"].(string)),
