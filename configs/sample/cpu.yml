@@ -1,0 +1,20 @@
+dev:
+  start_time: -3600
+  metric_name: CPUUtilization
+  namespace: AWS/EC2
+  period: 300
+  statistics: Maximum
+  dimensions:
+    - name: InstanceId
+      value: i-xxxxxxxx
+  unit: Percent
+stg:
+  start_time: -600
+  metric_name: CPUUtilization
+  namespace: AWS/EC2
+  period: 300
+  statistics: Maximum
+  dimensions:
+    - name: InstanceId
+      value: i-xxxxxxxxxxxxx
+  unit: Percent
